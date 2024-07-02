@@ -32,7 +32,10 @@
                 "redhat.vscode-yaml",
                 "tamasfe.even-better-toml",
                 "njqdev.vscode-python-typehint",
-                "vscode-icons-team.vscode-icons"
+                "vscode-icons-team.vscode-icons",
++               "ms-python.black-formatter",
++               "Codeium.codeium",
++               "ms-python.mypy-type-checker"
             ]
         }
     },

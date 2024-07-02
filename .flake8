@@ -1,2 +1,11 @@
 [flake8]
-ignore = D100, DAR101, DAR201, DAR301, DAR401
+ignore =
+    D100,
+    DAR101,
+    DAR201,
+    DAR301,
+    DAR401,
+    # Missing docstring in public package
+    D104,
+    # Found using `@staticmethod`
+    WPS602,
