@@ -9,3 +9,5 @@ ignore =
     D104,
     # Found using `@staticmethod`
     WPS602,
+    #Found implicit `.get()` dict usage
+    WPS529
