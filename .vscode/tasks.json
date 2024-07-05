@@ -16,6 +16,11 @@
             "label": "MyPy",
             "type": "shell",
             "command": "poetry run mypy src/app",
-        }
+        },
+        {
+            "label": "Coverage",
+            "type": "shell",
+            "command": "poetry run coverage run -m pytest src/tests && coverage xml -i",
+        },
     ]
 }
