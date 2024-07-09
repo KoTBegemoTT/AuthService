@@ -21,7 +21,7 @@ class AuthService:
     def register(username: str, password: str) -> str:
         """Регистрация пользователя."""
         if AuthService.user_exists(username):
-            raise ValueError("User with this username already exists")
+            raise ValueError('User with this username already exists')
 
         user = User(username=username, password=password)
         token = jwt_encode(asdict(user))
