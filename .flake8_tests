@@ -1,0 +1,26 @@
+[flake8]
+ignore =
+    # Found too short name
+    WPS111,
+    # Found string literal over-use
+    WPS226,
+    # Found `f` string
+    WPS305,
+    # incorrect multi-line parameters
+    WPS317,
+    WPS318,
+    WPS319,
+    # Found outer scope names shadowing
+    WPS442,
+    # Found imports collision
+    WPS458,
+    # Missing docstrings
+    D100,
+    D101,
+    D102,
+    D103,
+    D104,
+    # Use of assert detected
+    S101,
+    # trailing comma prohibited
+    C819

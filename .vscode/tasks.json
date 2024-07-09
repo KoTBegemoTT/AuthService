@@ -10,7 +10,7 @@
         {
             "label": "Flake8_tests",
             "type": "shell",
-            "command": "poetry run flake8 --ignore=WPS111,WPS226,WPS305,WPS317,WPS318,WPS319,WPS442,WPS458,D100,D101,D102,D103,D104,S101,C819 --jobs=1 src/tests",
+            "command": "poetry run flake8 --config='.flake8_tests' --jobs=1 src/tests",
         },
         {
             "label": "ISort",
