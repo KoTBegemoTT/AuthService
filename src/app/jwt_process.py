@@ -15,7 +15,7 @@ def jwt_encode(
     payload: dict,
     private_key: str = jwt_private_key,
     algorithm: str = crypto_algorithm,
-):
+) -> str:
     """Создание токена."""
     return jwt.encode(payload, private_key, algorithm=algorithm)
 
@@ -24,6 +24,6 @@ def jwt_decode(
     token: str | bytes,
     public_key: str = jwt_public_key,
     algorithm: str = crypto_algorithm,
-):
+) -> dict:
     """Расшифровка токена."""
     return jwt.decode(token, public_key, algorithms=[algorithm])
