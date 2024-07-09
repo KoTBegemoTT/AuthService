@@ -8,6 +8,11 @@
             "command": "poetry run flake8 --jobs=1 src/app",
         },
         {
+            "label": "Flake8_tests",
+            "type": "shell",
+            "command": "poetry run flake8 --ignore=WPS111,WPS226,WPS305,WPS317,WPS318,WPS319,WPS442,WPS458,D100,D101,D102,D103,D104,S101,C819 --jobs=1 src/tests",
+        },
+        {
             "label": "ISort",
             "type": "shell",
             "command": "poetry run isort src/app",
