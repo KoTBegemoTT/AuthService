@@ -9,16 +9,17 @@ readme = "README.md"
 python = "^3.12"
 pyjwt = "^2.8.0"
 cryptography = "^42.0.8"
-coverage = "^7.5.4"
 
 [tool.poetry.group.dev.dependencies]
 wemake-python-styleguide = "^0.19.2"
 pytest = "^8.2.2"
 black = "^24.4.2"
 mypy = "^1.10.1"
+coverage = "^7.5.4"
+coverage-threshold = "^0.4.4"
 
 [tool.black]
-line-length = 100
+line-length = 88
 
 [build-system]
 requires = ["poetry-core"]

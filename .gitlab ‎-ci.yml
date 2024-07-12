@@ -1,0 +1,36 @@
+stages:
+  - lint
+  - test
+
+variables:
+  CONTAINER_IMAGE: python:3.12
+
+before_script:
+  - pip install poetry
+  - poetry install
+
+flake8:
+  stage: lint
+  image: $CONTAINER_IMAGE
+  script:
+    - poetry run flake8 --jobs=1 src/app
+
+flake8-tests:
+  stage: lint
+  image: $CONTAINER_IMAGE
+  script:
+    - poetry run flake8 --config='.flake8_tests' --jobs=1 src/tests
+
+mypy:
+  stage: lint
+  image: $CONTAINER_IMAGE
+  script:
+    - poetry run mypy src/app
+
+pytest-and-coverage:
+  stage: test
+  image: $CONTAINER_IMAGE
+  script:
+    - poetry run coverage run
+    - poetry run coverage json
+    - poetry run coverage-threshold --line-coverage-min=90  --file-line-coverage-min=60
