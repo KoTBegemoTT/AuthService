@@ -3,7 +3,7 @@ stages:
   - test
 
 variables:
-  CONTAINER_IMAGE: python:3.12
+  CONTAINER_IMAGE: python:3.12-slim
 
 before_script:
   - pip install poetry
@@ -14,18 +14,38 @@ flake8:
   image: $CONTAINER_IMAGE
   script:
     - poetry run flake8 --jobs=1 src/app
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "push"
+    changes:
+      - src/**/*
+      - .gitlab-ci.yml
+      - poetry.lock
+      - .flake8
 
 flake8-tests:
   stage: lint
   image: $CONTAINER_IMAGE
   script:
     - poetry run flake8 --config='.flake8_tests' --jobs=1 src/tests
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "push"
+    changes:
+      - src/**/*
+      - .gitlab-ci.yml
+      - poetry.lock
+      - .flake8_tests
 
 mypy:
   stage: lint
   image: $CONTAINER_IMAGE
   script:
     - poetry run mypy src/app
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "push"
+    changes:
+      - src/**/*
+      - .gitlab-ci.yml
+      - poetry.lock
 
 pytest-and-coverage:
   stage: test
@@ -34,3 +54,9 @@ pytest-and-coverage:
     - poetry run coverage run
     - poetry run coverage json
     - poetry run coverage-threshold --line-coverage-min=90  --file-line-coverage-min=60
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "push"
+    changes:
+      - src/**/*
+      - .gitlab-ci.yml
+      - poetry.lock
