@@ -14,3 +14,9 @@
 - Открыть директорию с репозиторием через Visual Studio Code
 - Установить [рекомендуемые плагины](.vscode/extensions.json) Visual Studio Code
 - Ввести `Ctrl+Shift+P` или `Cmd+Shift+P` и выбрать `Dev Containers: Rebuild and Reopen in Container`
+
+
+## Расположение компонентов
+
+- Исходный код проекта: src/app
+- Тесты src/tests
