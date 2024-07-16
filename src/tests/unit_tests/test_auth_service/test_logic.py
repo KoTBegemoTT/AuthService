@@ -1,8 +1,8 @@
 import pytest
 
-from app import logic
-from app.logic import AuthService, users
 from app.models import User
+from src.app.auth_service import logic
+from src.app.auth_service.logic import AuthService, users
 
 user_password_params = [
     pytest.param('user_1', 'password', id='user_1'),
