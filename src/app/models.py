@@ -5,5 +5,5 @@ from dataclasses import dataclass
 class User:
     """Модель пользователя."""
 
-    username: str
-    password: str
+    name: str
+    password: bytes
