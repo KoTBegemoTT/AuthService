@@ -7,7 +7,7 @@ from app.auth_service.urls import router as users_router
 
 
 app = FastAPI()
-app.include_router(users_router, prefix="/users")
+app.include_router(users_router)
 
 
 @app.get("/")
