@@ -1,6 +1,6 @@
 import pytest
 
-from src.app.auth_service.logic import users
+from app.auth_service.views import users
 
 
 @pytest.fixture(autouse=True)
