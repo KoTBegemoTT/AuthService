@@ -1,24 +1,14 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 
-class UserSchemaBase(BaseModel):
+class UserSchema(BaseModel):
+    """Схема пользователя."""
+
     name: str
     password: str
 
 
-class CreateUserSchema(UserSchemaBase):
-    pass
-
-
-class LoginUserSchema(UserSchemaBase):
-    pass
-
-
-class UserSchema(UserSchemaBase):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-
-
 class TokenSchema(BaseModel):
+    """Схема токена."""
+
     token: str | None

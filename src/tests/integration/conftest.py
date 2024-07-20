@@ -1,9 +1,8 @@
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
 
-from app.main import app
 from app.auth_service.views import users
-
+from app.main import app
 
 client = TestClient(app)
 
@@ -13,6 +12,6 @@ def setup():
     users.clear()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def test_client():
     return client

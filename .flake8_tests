@@ -2,6 +2,8 @@
 ignore =
     # Found too short name
     WPS111,
+    # Found too many arguments
+    WPS211,
     # Found string literal over-use
     WPS226,
     # Found `f` string
@@ -10,6 +12,8 @@ ignore =
     WPS317,
     WPS318,
     WPS319,
+    #Found nested function
+    WPS430,
     # Found outer scope names shadowing
     WPS442,
     # Found imports collision
@@ -23,4 +27,6 @@ ignore =
     # Use of assert detected
     S101,
     # trailing comma prohibited
+    # Possible hardcoded password
+    S106
     C819

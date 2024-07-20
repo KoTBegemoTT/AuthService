@@ -15,7 +15,7 @@
         {
             "label": "ISort",
             "type": "shell",
-            "command": "poetry run isort src/app",
+            "command": "poetry run isort src",
         },
         {
             "label": "MyPy",

@@ -1,7 +1,7 @@
 import pytest
+from fastapi import status
 
-from app.auth_service.views import verify_password, users
-from app.schemas import CreateUserSchema
+from app.auth_service.views import users, verify_password
 from app.jwt_tokens.jwt_process import jwt_decode
 
 user_password_params = [
@@ -15,9 +15,9 @@ class TestAuthService:
     @pytest.mark.parametrize('username, password', user_password_params)
     def test_register(self, test_client, username, password):
         response = test_client.post(
-            '/users/register', json={'name': username, 'password': password})
+            '/register', json={'name': username, 'password': password})
 
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         assert len(users) == 1
         user = list(users.keys())[0]
 
@@ -27,12 +27,12 @@ class TestAuthService:
     @pytest.mark.parametrize('username, password', user_password_params)
     def test_login(self, test_client, username, password):
         test_client.post(
-            '/users/register', json={'name': username, 'password': password})
+            '/register', json={'name': username, 'password': password})
 
         response = test_client.post(
-            '/users/auth', json={'name': username, 'password': password})
+            '/auth', json={'name': username, 'password': password})
 
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         token = response.json()['token']
 
         assert token is not None

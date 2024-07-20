@@ -1,9 +1,10 @@
 from dataclasses import asdict
+
 import bcrypt
 
 from app.jwt_tokens.jwt_process import jwt_encode
 from app.models import User
-from app.schemas import CreateUserSchema, LoginUserSchema
+from app.schemas import UserSchema
 
 users: dict[User, str] = {}
 
@@ -11,8 +12,7 @@ users: dict[User, str] = {}
 def hash_password(password: str) -> bytes:
     """Хеширование пароля."""
     salt = bcrypt.gensalt()
-    hashed_password: bytes = bcrypt.hashpw(password.encode(), salt)
-    return hashed_password
+    return bcrypt.hashpw(password.encode(), salt)
 
 
 def verify_password(password: str, hashed_password: bytes) -> bool:
@@ -28,10 +28,10 @@ def user_exists(new_username: str) -> bool:
     return False
 
 
-def register_view(user_in: CreateUserSchema) -> str:
+def register_view(user_in: UserSchema) -> str:
     """Регистрация пользователя."""
     if user_exists(user_in.name):
-        raise ValueError("User with this username already exists")
+        raise ValueError('User with this username already exists')
 
     hashed_password = hash_password(user_in.password)
     user = User(user_in.name, hashed_password)
@@ -40,13 +40,11 @@ def register_view(user_in: CreateUserSchema) -> str:
     return token
 
 
-def login_view(user_in: LoginUserSchema) -> str | None:
+def login_view(user_in: UserSchema) -> str | None:
     """Авторизация пользователя."""
-    for user in users:
+    for user in users.keys():
         if user.name == user_in.name:
             if verify_password(user_in.password, user.password):
                 users[user] = jwt_encode(asdict(user))
                 return users[user]
-            else:
-                break
     return None
