@@ -14,6 +14,8 @@ ignore =
     WPS319,
     #Found nested function
     WPS430,
+    # Found control variable used after block
+    WPS441,
     # Found outer scope names shadowing
     WPS442,
     # Found imports collision
