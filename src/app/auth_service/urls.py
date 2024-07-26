@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 
 from app.auth_service.views import login_view, register_view
-from app.schemas import TokenSchema, UserSchema
+from app.auth_service.schemas import TokenSchema, UserSchema
 
 router = APIRouter(tags=['users'])
 

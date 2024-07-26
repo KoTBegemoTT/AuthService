@@ -4,7 +4,7 @@ import bcrypt
 
 from app.jwt_tokens.jwt_process import jwt_encode
 from app.models import User
-from app.schemas import UserSchema
+from app.auth_service.schemas import UserSchema
 
 users: dict[User, str] = {}
 

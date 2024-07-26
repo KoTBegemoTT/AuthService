@@ -3,7 +3,7 @@ import pytest
 from app.auth_service import views
 from app.auth_service.views import login_view, register_view, user_exists, users  # noqa: E501
 from app.models import User
-from app.schemas import UserSchema
+from src.app.auth_service.schemas import UserSchema
 
 user_password_params = [
     pytest.param('user_1', 'password', id='user_1'),

@@ -1,7 +1,7 @@
 import pytest
 from pydantic_core import ValidationError
 
-from app.schemas import TokenSchema, UserSchema
+from src.app.auth_service.schemas import TokenSchema, UserSchema
 
 
 @pytest.mark.parametrize(
