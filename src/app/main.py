@@ -18,5 +18,5 @@ if __name__ == '__main__':
         'main:app',
         reload=True,
         host='0.0.0.0',  # noqa: S104
-        port=8000,  # noqa: WPS432
+        port=8001,  # noqa: WPS432
     )
