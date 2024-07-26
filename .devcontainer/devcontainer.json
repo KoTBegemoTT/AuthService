@@ -1,5 +1,5 @@
 {
-    "name": "SHIFT Python 2024",
+    "name": "Auth service",
     "dockerComposeFile": "docker-compose.yml",
     "service": "auth-app",
     "workspaceFolder": "/workspace",
