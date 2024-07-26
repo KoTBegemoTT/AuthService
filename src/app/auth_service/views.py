@@ -2,9 +2,9 @@ from dataclasses import asdict
 
 import bcrypt
 
+from app.auth_service.schemas import UserSchema
 from app.jwt_tokens.jwt_process import jwt_encode
 from app.models import User
-from app.auth_service.schemas import UserSchema
 
 users: dict[User, str] = {}
 
@@ -20,7 +20,7 @@ def verify_password(password: str, hashed_password: bytes) -> bool:
     return bcrypt.checkpw(password.encode(), hashed_password)
 
 
-def user_exists(new_username: str) -> bool:
+async def user_exists(new_username: str) -> bool:
     """Проверка существования пользователя."""
     for user in users:
         if user.name == new_username:
@@ -28,9 +28,9 @@ def user_exists(new_username: str) -> bool:
     return False
 
 
-def register_view(user_in: UserSchema) -> str:
+async def register_view(user_in: UserSchema) -> str:
     """Регистрация пользователя."""
-    if user_exists(user_in.name):
+    if await user_exists(user_in.name):
         raise ValueError('User with this username already exists')
 
     hashed_password = hash_password(user_in.password)
@@ -40,7 +40,7 @@ def register_view(user_in: UserSchema) -> str:
     return token
 
 
-def login_view(user_in: UserSchema) -> str | None:
+async def login_view(user_in: UserSchema) -> str | None:
     """Авторизация пользователя."""
     for user in users.keys():
         if user.name == user_in.name:

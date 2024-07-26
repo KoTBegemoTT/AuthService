@@ -19,6 +19,7 @@ black = "^24.4.2"
 mypy = "^1.10.1"
 coverage = "^7.5.4"
 coverage-threshold = "^0.4.4"
+pytest-asyncio = "^0.23.8"
 
 [tool.pytest.ini_options]
 pythonpath = ". src"

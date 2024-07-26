@@ -12,9 +12,10 @@ user_password_params = [
 
 
 @pytest.mark.parametrize('username, password', user_password_params)
-def test_register(self, test_client, username, password):
-    response = test_client.post(
-        '/register', json={'name': username, 'password': password})
+@pytest.mark.asyncio
+async def test_register(ac, username, password):
+    response = await ac.post(
+        '/register/', json={'name': username, 'password': password})
 
     assert response.status_code == status.HTTP_201_CREATED
     assert len(users) == 1
@@ -23,13 +24,15 @@ def test_register(self, test_client, username, password):
     assert user.name == username
     assert verify_password(password, user.password)
 
-@pytest.mark.parametrize('username, password', user_password_params)
-def test_login(self, test_client, username, password):
-    test_client.post(
-        '/register', json={'name': username, 'password': password})
 
-    response = test_client.post(
-        '/auth', json={'name': username, 'password': password})
+@pytest.mark.parametrize('username, password', user_password_params)
+@pytest.mark.asyncio
+async def test_login(ac, username, password):
+    await ac.post(
+        '/register/', json={'name': username, 'password': password})
+
+    response = await ac.post(
+        '/auth/', json={'name': username, 'password': password})
 
     assert response.status_code == status.HTTP_201_CREATED
     token = response.json()['token']

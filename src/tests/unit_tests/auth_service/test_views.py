@@ -36,11 +36,12 @@ def mock_hash_password(monkeypatch):
 
 class TestAuthService:
     @pytest.mark.parametrize('username, password', user_password_params)
-    def test_register(
+    @pytest.mark.asyncio
+    async def test_register(
         self, mock_token, mock_hash_password, username, password,
     ):
         new_user = UserSchema(name=username, password=password)
-        register_view(new_user)
+        await register_view(new_user)
 
         assert len(users) == 1
         user = list(users.keys())[0]
@@ -49,19 +50,21 @@ class TestAuthService:
         assert user.password == password
         assert users[user] == mock_token
 
-    def test_register_many_users(self, mock_hash_password, mock_token):
+    @pytest.mark.asyncio
+    async def test_register_many_users(self, mock_hash_password, mock_token):
         for i in range(10):
             new_user = UserSchema(
                 name=f'user_{i}', password=f'password_{i}')
-            register_view(new_user)
+            await register_view(new_user)
 
         assert len(users) == 10
 
-    def test_user_exists(self, mock_token):
-        assert user_exists('user_1') is False
+    @pytest.mark.asyncio
+    async def test_user_exists(self, mock_token):
+        assert await user_exists('user_1') is False
         user = User('user_1', b'password_1')
         users[user] = 'token'
-        assert user_exists('user_1') is True
+        assert await user_exists('user_1') is True
 
     @pytest.mark.parametrize(
         'username, password, second_password',
@@ -73,44 +76,48 @@ class TestAuthService:
                          id='empty_username_and_password',),
         ],
     )
-    def test_register_fail_user_exists(
+    @pytest.mark.asyncio
+    async def test_register_fail_user_exists(
             self, mock_hash_password, mock_token,
             username, password, second_password,
     ):
         with pytest.raises(ValueError):
-            register_view(UserSchema(name=username, password=password))
-            register_view(UserSchema(
+            await register_view(UserSchema(name=username, password=password))
+            await register_view(UserSchema(
                 name=username, password=second_password))
 
     @pytest.mark.parametrize('username, password', user_password_params)
-    def test_login_success(
+    @pytest.mark.asyncio
+    async def test_login_success(
             self, monkeypatch, mock_verify_password,
             mock_token, username, password,
     ):
         user = User(username, password)
         users[user] = 'some_token'
 
-        token = login_view(UserSchema(name=username, password=password))
+        token = await login_view(UserSchema(name=username, password=password))
 
         assert token == mock_token
 
     @pytest.mark.parametrize('username, password', user_password_params)
-    def test_login_fail_no_user(
+    @pytest.mark.asyncio
+    async def test_login_fail_no_user(
         self, mock_verify_password, username, password,
     ):
-        token = login_view(UserSchema(name=username, password=password))
+        token = await login_view(UserSchema(name=username, password=password))
 
         assert token is None
 
     @pytest.mark.parametrize('username, password', user_password_params)
-    def test_login_fail_wrong_password(
+    @pytest.mark.asyncio
+    async def test_login_fail_wrong_password(
         self, mock_verify_password,
         username, password,
     ):
         user = User(username, password)
         users[user] = 'some_token'
 
-        token = login_view(
+        token = await login_view(
             UserSchema(name=username, password='wrong_password'))
 
         assert token is None

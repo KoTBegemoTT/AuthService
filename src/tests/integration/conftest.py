@@ -1,10 +1,9 @@
 import pytest
-from fastapi.testclient import TestClient
+import pytest_asyncio
+from httpx import AsyncClient
 
 from app.auth_service.views import users
 from app.main import app
-
-client = TestClient(app)
 
 
 @pytest.fixture(autouse=True)
@@ -12,6 +11,7 @@ def setup():
     users.clear()
 
 
-@pytest.fixture(scope='session')
-def test_client():
-    return client
+@pytest_asyncio.fixture(scope='session')
+async def ac():
+    async with AsyncClient(app=app, base_url='http://test') as ac:
+        yield ac
