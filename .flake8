@@ -7,7 +7,15 @@ ignore =
     DAR401,
     # Missing docstring in public package
     D104,
+    # Found too many module members
+    WPS202,
+    # Found too many imported names from a module
+    WPS235,
+    # Found complex default value
+    WPS404,
     # Found using `@staticmethod`
     WPS602,
     # Found implicit `.get()` dict usage
-    WPS529
+    WPS529,
+    # Do not perform function calls in argument defaults.
+    B008

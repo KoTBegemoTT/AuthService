@@ -6,14 +6,22 @@ ignore =
     WPS211,
     # Found string literal over-use
     WPS226,
+    # Found too many module members
+    WPS202,
+    # Found too many imported names from a module
+    WPS235,
     # Found `f` string
     WPS305,
     # incorrect multi-line parameters
     WPS317,
     WPS318,
     WPS319,
+    # Found boolean non-keyword argument
+    WPS425,
     #Found nested function
     WPS430,
+    # Found block variables overlap
+    WPS440,
     # Found control variable used after block
     WPS441,
     # Found outer scope names shadowing
