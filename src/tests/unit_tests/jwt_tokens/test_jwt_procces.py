@@ -1,13 +1,7 @@
 import pytest
 
 from app.jwt_tokens.jwt_process import jwt_decode, jwt_encode
-
-pyload_valid_params = [
-    pytest.param({'name': 'admin'}, id='only_name'),
-    pytest.param(
-        {'name': 'admin', 'password': 'password'},
-        id='name_and_password'),
-]
+from app.models import User
 
 pyload_without_name_params = [
     pytest.param({'some': 'payload'}, id='some_payload'),
@@ -16,21 +10,37 @@ pyload_without_name_params = [
 ]
 
 
-class TestJwtProcess:
-    @pytest.mark.parametrize('payload', pyload_valid_params)
-    def test_jwt_encode(self, payload):
-        token = jwt_encode(payload)
-        assert isinstance(token, str)
+@pytest.mark.parametrize(
+    'user',
+    {
+        pytest.param(User(name='user_1', password=b'password'), id='user_1'),
+        pytest.param(User(name='admin', password=b'admin'),
+                     id='username_equals_password'),
+        pytest.param(User(name='', password=b''),
+                     id='empty_username_and_password'),
+    },
+)
+def test_jwt_encode(user):
+    token = jwt_encode(user)
+    assert isinstance(token, str)
 
-    @pytest.mark.parametrize('payload', pyload_valid_params)
-    def test_jwt_decode(self, payload):
-        token = jwt_encode(payload)
 
-        decode_data = jwt_decode(token)
+@pytest.mark.parametrize(
+    'user',
+    {
+        pytest.param(User(name='user_1', password=b'password'), id='user_1'),
+        pytest.param(User(name='admin', password=b'admin'),
+                     id='username_equals_password'),
+        pytest.param(User(name='', password=b''),
+                     id='empty_username_and_password'),
+    },
+)
+def test_jwt_decode(user):
+    token = jwt_encode(user)
 
-        assert decode_data['name'] == payload['name']
+    decode_data = jwt_decode(token)
 
-    @pytest.mark.parametrize('payload', pyload_without_name_params)
-    def test_jwt_encode_fail(self, payload):
-        with pytest.raises(KeyError):
-            jwt_encode(payload)
+    assert decode_data['username'] == user.name
+    assert 'password' not in decode_data
+    assert 'exp' in decode_data
+    assert 'iat' in decode_data

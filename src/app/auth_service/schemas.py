@@ -6,9 +6,3 @@ class UserSchema(BaseModel):
 
     name: str
     password: str
-
-
-class TokenSchema(BaseModel):
-    """Схема токена."""
-
-    token: str | None

@@ -1,28 +1,44 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 
-from app.auth_service.schemas import TokenSchema, UserSchema
-from app.auth_service.views import login_view, register_view
+from app.auth_service.schemas import UserSchema
+from app.auth_service.views import (
+    auth_view,
+    get_username_by_token_view,
+    register_view,
+    validate_auth_user,
+    validate_token,
+)
+from app.models import User
 
 router = APIRouter(tags=['users'])
 
 
 @router.post(
     '/register/',
-    response_model=TokenSchema,
     status_code=status.HTTP_201_CREATED,
 )
-async def register(user_in: UserSchema) -> TokenSchema:
+async def register(user_in: UserSchema) -> str:
     """Регистрация пользователя."""
-    token = await register_view(user_in)
-    return TokenSchema(token=token)
+    return await register_view(user_in)
 
 
 @router.post(
     '/auth/',
-    response_model=TokenSchema,
     status_code=status.HTTP_201_CREATED,
 )
-async def login(user_in: UserSchema) -> TokenSchema:
+async def auth(
+    user_in: User = Depends(validate_auth_user),
+) -> str:
     """Авторизация пользователя."""
-    token = await login_view(user_in)
-    return TokenSchema(token=token)
+    return await auth_view(user_in)
+
+
+@router.get(
+    '/check_token/',
+    status_code=status.HTTP_200_OK,
+)
+async def check_token(
+    payload: dict = Depends(validate_token),
+) -> str:
+    """Проверка токена."""
+    return await get_username_by_token_view(payload)
