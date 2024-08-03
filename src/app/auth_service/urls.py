@@ -13,6 +13,15 @@ from app.models import User
 router = APIRouter(tags=['users'])
 
 
+@router.get(
+    '/healthz/ready/',
+    status_code=status.HTTP_200_OK,
+)
+async def ready_check() -> bool:
+    """Проверка состояния сервиса."""
+    return True
+
+
 @router.post(
     '/register/',
     status_code=status.HTTP_201_CREATED,

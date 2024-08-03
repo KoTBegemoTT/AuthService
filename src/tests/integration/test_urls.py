@@ -119,3 +119,11 @@ async def test_check_token(ac, exists_user, status_code, response_json):
 
     assert response.status_code == status_code
     assert response.json() == response_json
+
+
+@pytest.mark.asyncio
+async def test_check_ready(ac):
+    response = await ac.get('/healthz/ready/')
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()
