@@ -37,6 +37,7 @@ ignore =
     # Use of assert detected
     S101,
     # trailing comma prohibited
-    # Possible hardcoded password
-    S106
     C819
+    # Possible hardcoded password
+    S105,
+    S106,

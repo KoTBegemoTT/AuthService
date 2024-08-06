@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends, status
 from app.auth_service.schemas import UserSchema
 from app.auth_service.views import (
     auth_view,
-    get_username_by_token_view,
     register_view,
     validate_auth_user,
     validate_token,
@@ -45,9 +44,8 @@ async def auth(
 @router.get(
     '/check_token/',
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(validate_token)],
 )
-async def check_token(
-    payload: dict = Depends(validate_token),
-) -> str:
+async def check_token(user_id: int) -> None:  # noqa: WPS324
     """Проверка токена."""
-    return await get_username_by_token_view(payload)
+    return None  # noqa: WPS324

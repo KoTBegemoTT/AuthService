@@ -95,10 +95,26 @@ async def auth_view(user: User) -> str:
     return token
 
 
-def validate_token(token: str) -> dict:
+async def get_token(user_id: int):
+    """Получение токена."""
+    if len(users) <= user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Token not found',
+        )
+
+    user = users[user_id]
+    if not await is_token_exist(user):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Token not found',
+        )
+
+    return user_tokens[user]
+
+
+def validate_token(token: str = Depends(get_token)) -> None:
     """Валидация токена."""
     try:
-        pyload = jwt_decode(token)
+        jwt_decode(token)
     except ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail='token expired',
@@ -107,32 +123,3 @@ def validate_token(token: str) -> dict:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid token',
         )
-    return pyload
-
-
-async def get_username_by_token_view(
-    pyload: dict = Depends(validate_token),
-) -> str:
-    """Получение имени пользователя по токену."""
-    try:
-        username = pyload['username']
-    except KeyError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='No username in token',
-        )
-
-    if not isinstance(username, str):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='username invalid',
-        )
-
-    user = await found_user(username)
-
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail='User not found',
-        )
-
-    return user.name

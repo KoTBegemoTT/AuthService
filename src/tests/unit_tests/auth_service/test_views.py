@@ -6,7 +6,7 @@ from app.auth_service.views import (
     auth_view,
     create_and_put_token,
     found_user,
-    get_username_by_token_view,
+    get_token,
     hash_password,
     is_token_exist,
     is_token_expired,
@@ -245,9 +245,7 @@ async def test_validate_token_success():
     user = User('user_1', b'password_1')
     token = jwt_encode(user)
 
-    validated = validate_token(token)
-
-    assert validated.get('username') == user.name
+    validate_token(token)
 
 
 @pytest.mark.asyncio
@@ -273,31 +271,32 @@ async def test_validate_token_expired():
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize('username, password', user_password_params)
-async def test_get_username_by_token(username, password):
+async def test_get_token(username, password):
     user = User(username, password)
     users.append(user)
-    pyload = {'username': user.name}
+    user_tokens[user] = 'token'
 
-    username = await get_username_by_token_view(pyload)
+    token = await get_token(user_id=0)
 
-    assert username == user.name
+    assert token == 'token'
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    'pyload, status_code, detail',
-    [
-        pytest.param({}, status.HTTP_401_UNAUTHORIZED,
-                     'No username in token', id='no_username'),
-        pytest.param({'username': None}, status.HTTP_401_UNAUTHORIZED,
-                     'username invalid', id='invalid'),
-        pytest.param({'username': 'user_1'}, status.HTTP_404_NOT_FOUND,
-                     'User not found', id='not_found'),
-    ],
-)
-async def test_get_username_by_token_fail(pyload, status_code, detail):
+async def test_get_token_no_user():
     with pytest.raises(HTTPException) as ex:
-        await get_username_by_token_view(pyload)
+        await get_token(user_id=1)
 
-    assert ex.value.status_code == status_code
-    assert ex.value.detail == detail
+    assert ex.value.status_code == status.HTTP_404_NOT_FOUND
+    assert ex.value.detail == 'Token not found'
+
+
+@pytest.mark.asyncio
+async def test_get_token_no_token():
+    user = User('user_1', b'password_1')
+    users.append(user)
+
+    with pytest.raises(HTTPException) as ex:
+        await get_token(user_id=0)
+
+    assert ex.value.status_code == status.HTTP_404_NOT_FOUND
+    assert ex.value.detail == 'Token not found'
