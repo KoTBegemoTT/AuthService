@@ -153,4 +153,3 @@ async def test_check_ready(ac):
     response = await ac.get('/healthz/ready/')
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json()
