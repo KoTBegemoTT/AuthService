@@ -16,9 +16,9 @@ router = APIRouter(tags=['users'])
     '/healthz/ready/',
     status_code=status.HTTP_200_OK,
 )
-async def ready_check() -> bool:
+async def ready_check() -> None:
     """Проверка состояния сервиса."""
-    return True
+    return None
 
 
 @router.post(
@@ -46,6 +46,6 @@ async def auth(
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(validate_token)],
 )
-async def check_token(user_id: int) -> None:  # noqa: WPS324
+async def check_token(user_id: int) -> None:
     """Проверка токена."""
-    return None  # noqa: WPS324
+    return None

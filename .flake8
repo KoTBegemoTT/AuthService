@@ -11,6 +11,7 @@ ignore =
     WPS202,
     # Found too many imported names from a module
     WPS235,
+    WPS324,
     # Found complex default value
     WPS404,
     # Found using `@staticmethod`
