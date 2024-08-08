@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, UploadFile, status
 
 from app.auth_service.schemas import UserSchema
 from app.auth_service.views import (
@@ -6,6 +6,7 @@ from app.auth_service.views import (
     register_view,
     validate_auth_user,
     validate_token,
+    verify_view,
 )
 from app.models import User
 
@@ -49,3 +50,12 @@ async def auth(
 async def check_token(user_id: int) -> None:
     """Проверка токена."""
     return None
+
+
+@router.post(
+    '/verify/',
+    status_code=status.HTTP_201_CREATED,
+)
+async def verify(file: UploadFile) -> None:
+    """Валидация пользователя."""
+    await verify_view(file)

@@ -1,5 +1,9 @@
+import asyncio
 import bcrypt  # noqa: WPS202
-from fastapi import Depends, HTTPException, status
+import brotli
+from aiokafka import AIOKafkaProducer
+import aiofiles
+from fastapi import Depends, HTTPException, UploadFile, status
 from jwt import ExpiredSignatureError, InvalidTokenError
 
 from app.auth_service.schemas import UserSchema
@@ -111,7 +115,7 @@ async def get_token(user_id: int):
     return user_tokens[user]
 
 
-def validate_token(token: str = Depends(get_token)) -> None:
+async def validate_token(token: str = Depends(get_token)) -> None:
     """Валидация токена."""
     try:
         jwt_decode(token)
@@ -123,3 +127,27 @@ def validate_token(token: str = Depends(get_token)) -> None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid token',
         )
+
+
+def create_producer() -> AIOKafkaProducer:
+    return AIOKafkaProducer(bootstrap_servers="kafka:9092")
+
+
+async def compress(message: str) -> bytes:
+    return brotli.compress(bytes(message, 'utf-8'))
+
+
+async def verify_view(file: UploadFile) -> None:
+    """Верификация пользователя."""
+    try:
+        file_path = f"/usr/photos/{file.filename}"
+        async with aiofiles.open(file_path, 'wb') as out_file:
+            content = await file.read()
+            await out_file.write(content)
+            compressed = await compress(file_path)
+            await asyncio.wait_for(create_producer().send(
+                "faces", compressed), timeout=10,
+            )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
