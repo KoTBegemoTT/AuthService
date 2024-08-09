@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 import jwt
 
 from app.models import User
-from app.settings import settings
+from app.config import settings
 
 
 def jwt_encode(

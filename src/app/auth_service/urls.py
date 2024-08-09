@@ -6,8 +6,8 @@ from app.auth_service.views import (
     register_view,
     validate_auth_user,
     validate_token,
-    verify_view,
 )
+from app.external.kafka import verify_view
 from app.models import User
 
 router = APIRouter(tags=['users'])
@@ -56,6 +56,6 @@ async def check_token(user_id: int) -> None:
     '/verify/',
     status_code=status.HTTP_201_CREATED,
 )
-async def verify(file: UploadFile) -> None:
+async def verify(file: UploadFile) -> dict:
     """Валидация пользователя."""
-    await verify_view(file)
+    return await verify_view(file)
