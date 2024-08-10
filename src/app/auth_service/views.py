@@ -1,9 +1,5 @@
-import asyncio
 import bcrypt  # noqa: WPS202
-import brotli
-from aiokafka import AIOKafkaProducer
-import aiofiles
-from fastapi import Depends, HTTPException, UploadFile, status
+from fastapi import Depends, HTTPException, status
 from jwt import ExpiredSignatureError, InvalidTokenError
 
 from app.auth_service.schemas import UserSchema

@@ -1,15 +1,15 @@
 from contextlib import asynccontextmanager
-import logging
-from aiokafka import AIOKafkaProducer
+
 import uvicorn
-from fastapi import APIRouter, FastAPI, UploadFile
-import brotli
+from fastapi import FastAPI
+
 from app.auth_service.urls import router as users_router
 from app.external.kafka import producer
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Настройка при запуске и остановке приложения."""
     await producer.start()
     yield
     await producer.stop()

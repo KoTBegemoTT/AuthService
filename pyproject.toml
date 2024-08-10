@@ -37,6 +37,9 @@ line_length = '79'
 pythonpath = ". src"
 testpaths = ["src/tests"]
 
+[tool.mypy]
+disable_error_code = 'import-untyped'
+
 [tool.coverage.run]
 command_line = "-m pytest"
 

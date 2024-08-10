@@ -1,4 +1,3 @@
-from functools import lru_cache
 from pathlib import Path
 
 from pydantic_settings import BaseSettings
@@ -20,9 +19,9 @@ class Settings(BaseSettings):
     # Настройки Kafka
     kafka_host: str = 'kafka'
     kafka_port: str = '9092'
-    kafka_instance: str = f"{kafka_host}:{kafka_port}"
+    kafka_instance: str = f'{kafka_host}:{kafka_port}'
     kafka_producer_topic: str = 'faces'
-    file_encoding: str = "utf-8"
+    file_encoding: str = 'utf-8'
     file_compression_quality: int = 1
 
 

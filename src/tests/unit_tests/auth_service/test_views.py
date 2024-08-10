@@ -245,13 +245,13 @@ async def test_validate_token_success():
     user = User('user_1', b'password_1')
     token = jwt_encode(user)
 
-    validate_token(token)
+    await validate_token(token)
 
 
 @pytest.mark.asyncio
 async def test_validate_token_invalid():
     with pytest.raises(HTTPException) as ex:
-        validate_token('invalid')
+        await validate_token('invalid')
 
     assert ex.value.status_code == status.HTTP_401_UNAUTHORIZED
     assert ex.value.detail == 'invalid token'
@@ -263,7 +263,7 @@ async def test_validate_token_expired():
     token = jwt_encode(user, expire_minutes=0)
 
     with pytest.raises(HTTPException) as ex:
-        validate_token(token)
+        await validate_token(token)
 
     assert ex.value.status_code == status.HTTP_401_UNAUTHORIZED
     assert ex.value.detail == 'token expired'

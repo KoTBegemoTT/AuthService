@@ -11,6 +11,8 @@ ignore =
     WPS202,
     # Found too many imported names from a module
     WPS235,
+    # Found `f` string
+    WPS305,
     WPS324,
     # Found complex default value
     WPS404,
