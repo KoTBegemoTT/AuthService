@@ -57,5 +57,5 @@ async def check_token(user_id: int) -> None:
     status_code=status.HTTP_201_CREATED,
 )
 async def verify(user_photo: UploadFile, user_id: int) -> dict:
-    """Валидация пользователя."""
+    """Подтверждение пользователя."""
     return await verify_view(user_photo, user_id)

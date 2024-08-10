@@ -16,11 +16,14 @@ producer = AIOKafkaProducer(
 
 async def compress(message: str) -> bytes:
     """Сжатие файла."""
-    return brotli.compress(bytes(message, settings.file_encoding), quality=1)
+    return brotli.compress(
+        bytes(message, settings.file_encoding),
+        quality=settings.file_compression_quality,
+    )
 
 
 async def verify_view(user_photo: UploadFile, user_id: int) -> dict:
-    """Валидация пользователя."""
+    """Подтверждение пользователя."""
     file_path = f'/usr/photos/{user_photo.filename}'
 
     try:
