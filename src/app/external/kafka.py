@@ -1,4 +1,3 @@
-
 import asyncio
 
 import aiofiles
@@ -31,9 +30,11 @@ async def verify_view(user_photo: UploadFile, user_id: int) -> dict:
             file_content = await user_photo.read()
             await out_file.write(file_content)
 
-            compressed_path = await compress(file_path)
+            message = f'{user_id}:{file_path}'
+            compressed_message = await compress(message)
             await producer.send_and_wait(
-                settings.kafka_producer_topic, compressed_path, user_id,
+                settings.kafka_producer_topic,
+                compressed_message,
             )
     except Exception as ex:
         raise HTTPException(
