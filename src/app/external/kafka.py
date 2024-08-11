@@ -30,11 +30,12 @@ async def verify_view(user_photo: UploadFile, user_id: int) -> dict:
             file_content = await user_photo.read()
             await out_file.write(file_content)
 
-            message = f'{user_id}:{file_path}'
-            compressed_message = await compress(message)
+            compressed_path = await compress(file_path)
+            compresed_id = await compress(str(user_id))
             await producer.send_and_wait(
-                settings.kafka_producer_topic,
-                compressed_message,
+                topic=settings.kafka_producer_topic,
+                key=compresed_id,
+                value=compressed_path,
             )
     except Exception as ex:
         raise HTTPException(
