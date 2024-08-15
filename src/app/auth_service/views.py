@@ -7,6 +7,7 @@ from app.db.db_helper import db_helper
 from app.jwt_tokens.jwt_process import jwt_decode, jwt_encode
 from app.db.models import User
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import Result, select
 
 users: list[User] = []
 user_tokens: dict[User, str] = {}
@@ -24,12 +25,10 @@ def verify_password(password: str, hashed_password: bytes) -> bool:
 
 
 async def found_user(username: str, session: AsyncSession) -> User | None:
-    """Проверка существования пользователя."""
-    user =  await session.get(User, {'name': username})
-    for user in users:
-        if user.name == username:
-            return user
-    return None
+    """Получение пользователя по имени."""
+    db_request = select(User).where(User.name == username)
+    founded_user: Result = await session.execute(db_request)
+    return founded_user.scalar()
 
 
 async def create_and_put_token(user: User) -> str:
@@ -44,11 +43,11 @@ async def register_view(
         session: AsyncSession,
 ) -> str:
     """Регистрация пользователя."""
-    # if await found_user(user_in.name, session):
-    #     raise HTTPException(
-    #         status_code=status.HTTP_409_CONFLICT,
-    #         detail='Username already exists',
-    #     )
+    if await found_user(user_in.name, session):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Username already exists',
+        )
 
     hashed_password = hash_password(user_in.password)
 
@@ -56,10 +55,6 @@ async def register_view(
     session.add(user)
     await session.commit()
     return user.name
-
-    # user = User(user_in.name, hashed_password)
-    # users.append(user)
-    # return await create_and_put_token(user)
 
 
 async def validate_auth_user(user_in: UserSchema) -> User:
