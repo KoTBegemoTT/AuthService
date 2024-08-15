@@ -9,7 +9,6 @@ from app.db.models import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import Result, select
 
-users: list[User] = []
 user_tokens: dict[User, str] = {}
 
 
@@ -57,9 +56,12 @@ async def register_view(
     return user.name
 
 
-async def validate_auth_user(user_in: UserSchema) -> User:
+async def validate_auth_user(
+    user_in: UserSchema,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency)
+) -> User:
     """Валидация пользователя."""
-    user_bd = await found_user(user_in.name)
+    user_bd = await found_user(user_in.name, session)
 
     if user_bd is None:
         raise HTTPException(
@@ -102,14 +104,17 @@ async def auth_view(user: User) -> str:
     return token
 
 
-async def get_token(user_id: int):
+async def get_token(
+    user_id: int,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
     """Получение токена."""
-    if len(users) <= user_id:
+    user = await session.get(User, user_id)
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Token not found',
         )
 
-    user = users[user_id]
     if not await is_token_exist(user):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Token not found',
