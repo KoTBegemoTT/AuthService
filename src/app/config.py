@@ -1,5 +1,4 @@
 from pathlib import Path
-
 from pydantic_settings import BaseSettings
 
 BASE_DIR = Path(__file__).parent
@@ -24,5 +23,13 @@ class Settings(BaseSettings):
     file_encoding: str = 'utf-8'
     file_compression_quality: int = 1
 
+    # Настройки db
+    db_user: str = 'postgres'
+    db_password: str = 'postgres'
+    db_host: str = 'host.docker.internal'
+    db_port: str = '5432'
+    db_table: str = 'credit_card'
+    db_url: str = f'postgresql+asyncpg://{db_user}:{db_password}@{db_host}:{db_port}/{db_table}'
+    db_echo: bool = True
 
 settings = Settings()
