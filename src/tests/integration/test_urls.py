@@ -3,7 +3,7 @@ from fastapi import status
 
 from app.auth_service.views import user_tokens, users, verify_password
 from app.jwt_tokens.jwt_process import jwt_decode, jwt_encode
-from app.models import User
+from app.db.models import User
 
 user_password_params = [
     pytest.param('user_1', 'password', id='user_1'),

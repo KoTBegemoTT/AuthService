@@ -8,7 +8,9 @@ from app.auth_service.views import (
     validate_token,
 )
 from app.external.kafka import verify_view
-from app.models import User
+from app.db.models import User
+from app.db.db_helper import db_helper
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(tags=['users'])
 
@@ -26,9 +28,12 @@ async def ready_check() -> None:
     '/register/',
     status_code=status.HTTP_201_CREATED,
 )
-async def register(user_in: UserSchema) -> str:
+async def register(
+    user_in: UserSchema,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency)
+) -> str:
     """Регистрация пользователя."""
-    return await register_view(user_in)
+    return await register_view(user_in, session)
 
 
 @router.post(

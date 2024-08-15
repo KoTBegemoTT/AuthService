@@ -1,6 +1,6 @@
 import pytest
 
-from app.models import User
+from app.db.models import User
 
 
 @pytest.mark.parametrize(
