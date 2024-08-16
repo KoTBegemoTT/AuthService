@@ -30,6 +30,6 @@ class Settings(BaseSettings):
     db_port: str = '5432'
     db_table: str = 'credit_card'
     db_url: str = f'postgresql+asyncpg://{db_user}:{db_password}@{db_host}:{db_port}/{db_table}'
-    db_echo: bool = True
+    db_echo: bool = False
 
 settings = Settings()

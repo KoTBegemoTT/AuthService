@@ -9,7 +9,7 @@ from app.db.models import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import Result, select
 
-user_tokens: dict[User, str] = {}
+user_tokens: dict[int, str] = {}
 
 
 def hash_password(password: str) -> bytes:
@@ -33,7 +33,7 @@ async def found_user(username: str, session: AsyncSession) -> User | None:
 async def create_and_put_token(user: User) -> str:
     """Создание токена."""
     token = jwt_encode(user)
-    user_tokens[user] = token
+    user_tokens[user.id] = token
     return token
 
 
@@ -53,7 +53,7 @@ async def register_view(
     user = User(name=user_in.name, password=hashed_password)
     session.add(user)
     await session.commit()
-    return user.name
+    return await create_and_put_token(user)
 
 
 async def validate_auth_user(
@@ -87,17 +87,17 @@ async def is_token_expired(token: str) -> bool:
     return False
 
 
-async def is_token_exist(user: User) -> bool:
+async def is_token_exist(user_id: int) -> bool:
     """Проверка существования токена."""
-    return user in user_tokens
+    return user_id in user_tokens
 
 
 async def auth_view(user: User) -> str:
     """Авторизация пользователя."""
-    if not await is_token_exist(user):
+    if not await is_token_exist(user.id):
         return await create_and_put_token(user)
 
-    token = user_tokens[user]
+    token = user_tokens[user.id]
     if await is_token_expired(token):
         return await create_and_put_token(user)
 
@@ -115,12 +115,12 @@ async def get_token(
             status_code=status.HTTP_404_NOT_FOUND, detail='Token not found',
         )
 
-    if not await is_token_exist(user):
+    if not await is_token_exist(user.id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Token not found',
         )
 
-    return user_tokens[user]
+    return user_tokens[user.id]
 
 
 async def validate_token(token: str = Depends(get_token)) -> None:
