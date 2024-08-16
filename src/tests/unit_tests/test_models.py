@@ -1,6 +1,7 @@
 import pytest
 
 from app.db.models import User
+import sqlalchemy
 
 
 @pytest.mark.parametrize(
@@ -14,27 +15,38 @@ from app.db.models import User
                      id='empty_username_and_password'),
     ],
 )
-def test_user_model(pyload):
+@pytest.mark.usefixtures('reset_db')
+@pytest.mark.asyncio
+async def test_user_model(pyload, db_helper):
     user = User(**pyload)
     assert user.name == pyload.get('name')
     assert user.password == pyload.get('password')
+
+    async with db_helper.session_factory() as session:
+        session.add(user)
+        await session.commit()
 
 
 @pytest.mark.parametrize(
     'pyload, error_msg',
     [
         pytest.param(
-            {'password': 'password'},
-            "User.__init__() missing 1 required positional argument: 'name'",
+            {'password': b'password'},
+            'значение NULL в столбце "name" отношения "users" нарушает ограничение NOT NULL',
             id='no_name'),
         pytest.param(
             {'name': 'user'},
-            "User.__init__() missing 1 required positional argument: 'password'",  # noqa: E501
+            'значение NULL в столбце "password" отношения "users" нарушает ограничение NOT NULL',  # noqa: E501
             id='no_password'),
     ],
 )
-def test_user_model_fail(pyload, error_msg):
-    with pytest.raises(TypeError) as ex:
-        User(**pyload)
+@pytest.mark.usefixtures('reset_db')
+@pytest.mark.asyncio
+async def test_user_model_fail(pyload, error_msg, db_helper):
+    async with db_helper.session_factory() as session:
+        with pytest.raises(sqlalchemy.exc.IntegrityError) as ex:
+            user = User(**pyload)
+            session.add(user)
+            await session.commit()
 
-    assert ex.value.args[0] == error_msg
+    assert error_msg in str(ex.value)
