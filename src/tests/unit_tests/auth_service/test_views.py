@@ -1,5 +1,6 @@
 import pytest
-from fastapi import Depends, HTTPException, status
+from fastapi import HTTPException, status
+from sqlalchemy import select
 
 from app.auth_service import views
 from app.auth_service.views import (
@@ -16,11 +17,9 @@ from app.auth_service.views import (
     validate_token,
     verify_password,
 )
-from app.jwt_tokens.jwt_process import jwt_encode
 from app.db.models import User
+from app.jwt_tokens.jwt_process import jwt_encode
 from src.app.auth_service.schemas import UserSchema
-from sqlalchemy import insert, select
-
 
 user_password_params = [
     pytest.param('user_1', 'password', id='user_1'),
@@ -56,10 +55,6 @@ async def get_users(session):
     result = await session.execute(db_request)
     users = result.scalars().all()
     return list(users)
-
-
-async def get_user(session, user_id):
-    return await session.get(User, user_id)
 
 
 @pytest.mark.parametrize('password, confirm_password, is_verified', [
@@ -143,7 +138,9 @@ async def test_found_user(db_helper):
     ],
 )
 @pytest.mark.asyncio
-@pytest.mark.usefixtures('mock_hash_password', 'reset_db', 'clear_tokens', 'mock_token')
+@pytest.mark.usefixtures(
+    'mock_hash_password', 'reset_db', 'clear_tokens', 'mock_token',
+)
 async def test_register_fail_user_exists(
         db_helper, username, password, second_password,
 ):
@@ -151,11 +148,11 @@ async def test_register_fail_user_exists(
         with pytest.raises(HTTPException) as ex:
             await register_view(
                 UserSchema(name=username, password=password),
-                session
+                session,
             )
             await register_view(
                 UserSchema(name=username, password=second_password),
-                session
+                session,
             )
 
     assert ex.value.status_code == status.HTTP_409_CONFLICT

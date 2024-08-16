@@ -1,7 +1,7 @@
 import pytest
+import sqlalchemy
 
 from app.db.models import User
-import sqlalchemy
 
 
 @pytest.mark.parametrize(
@@ -32,7 +32,7 @@ async def test_user_model(pyload, db_helper):
     [
         pytest.param(
             {'password': b'password'},
-            'значение NULL в столбце "name" отношения "users" нарушает ограничение NOT NULL',
+            'значение NULL в столбце "name" отношения "users" нарушает ограничение NOT NULL',  # noqa: E501
             id='no_name'),
         pytest.param(
             {'name': 'user'},

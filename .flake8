@@ -7,6 +7,8 @@ ignore =
     DAR401,
     # Missing docstring in public package
     D104,
+    # Missing docstring in __init__
+    D107,
     # Found too many module members
     WPS202,
     # Found too many imported names from a module
@@ -14,6 +16,8 @@ ignore =
     # Found `f` string
     WPS305,
     WPS324,
+    # Found variables that are only used for `return`
+    WPS331,
     # Found complex default value
     WPS404,
     # Found using `@staticmethod`

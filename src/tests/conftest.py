@@ -1,16 +1,16 @@
 import asyncio
 from typing import AsyncGenerator
+
 import pytest
 import pytest_asyncio
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Base
-from app.main import app
 from app.auth_service.views import user_tokens
 from app.db.db_helper import DatabaseHelper, db_helper
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from app.db.models import Base
+from app.main import app
 
-
-TEST_DB_URL = 'postgresql+asyncpg://postgres:postgres@host.docker.internal:5432/test_db'
+TEST_DB_URL = 'postgresql+asyncpg://postgres:postgres@host.docker.internal:5432/test_db'  # noqa: E501
 test_db_helper = DatabaseHelper(url=TEST_DB_URL, echo=True)
 
 

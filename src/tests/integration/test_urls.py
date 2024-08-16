@@ -3,8 +3,8 @@ from fastapi import status
 from sqlalchemy import select
 
 from app.auth_service.views import user_tokens, verify_password
-from app.jwt_tokens.jwt_process import jwt_decode, jwt_encode
 from app.db.models import User
+from app.jwt_tokens.jwt_process import jwt_decode, jwt_encode
 
 user_password_params = [
     pytest.param('user_1', 'password', id='user_1'),
@@ -14,11 +14,11 @@ user_password_params = [
 
 valid_token = jwt_encode(
     User(name='user_1', password=b'password'),
-    expire_minutes=1000
+    expire_minutes=1000,
 )
 expired_token = jwt_encode(
     User(name='user_1', password=b'password'),
-    expire_minutes=0
+    expire_minutes=0,
 )
 invalid_token = 'invalid_token'  # noqa: S105
 

@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from pydantic_settings import BaseSettings
 
 BASE_DIR = Path(__file__).parent
@@ -29,7 +30,8 @@ class Settings(BaseSettings):
     db_host: str = 'host.docker.internal'
     db_port: str = '5432'
     db_table: str = 'credit_card'
-    db_url: str = f'postgresql+asyncpg://{db_user}:{db_password}@{db_host}:{db_port}/{db_table}'
+    db_url: str = f'postgresql+asyncpg://{db_user}:{db_password}@{db_host}:{db_port}/{db_table}'  # noqa: E501, WPS221
     db_echo: bool = False
+
 
 settings = Settings()

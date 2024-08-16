@@ -1,7 +1,7 @@
 import pytest
 
-from app.jwt_tokens.jwt_process import jwt_decode, jwt_encode
 from app.db.models import User
+from app.jwt_tokens.jwt_process import jwt_decode, jwt_encode
 
 pyload_without_name_params = [
     pytest.param({'some': 'payload'}, id='some_payload'),

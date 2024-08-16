@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, UploadFile, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth_service.schemas import UserSchema
 from app.auth_service.views import (
@@ -7,10 +8,9 @@ from app.auth_service.views import (
     validate_auth_user,
     validate_token,
 )
-from app.external.kafka import verify_view
-from app.db.models import User
 from app.db.db_helper import db_helper
-from sqlalchemy.ext.asyncio import AsyncSession
+from app.db.models import User
+from app.external.kafka import verify_view
 
 router = APIRouter(tags=['users'])
 
@@ -30,7 +30,7 @@ async def ready_check() -> None:
 )
 async def register(
     user_in: UserSchema,
-    session: AsyncSession = Depends(db_helper.scoped_session_dependency)
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> str:
     """Регистрация пользователя."""
     return await register_view(user_in, session)

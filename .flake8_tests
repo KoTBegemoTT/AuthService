@@ -1,13 +1,19 @@
 [flake8]
 ignore =
+    # Found wrong variable name
+    WPS110,
     # Found too short name
     WPS111,
+    # Found too many module members
+    WPS202,
+    # Found overused expression
+    WPS204,
+    # Found too many local variables
+    WPS210,
     # Found too many arguments
     WPS211,
     # Found string literal over-use
     WPS226,
-    # Found too many module members
-    WPS202,
     # Found too many imported names from a module
     WPS235,
     # Found `f` string

@@ -1,13 +1,13 @@
 import bcrypt  # noqa: WPS202
 from fastapi import Depends, HTTPException, status
 from jwt import ExpiredSignatureError, InvalidTokenError
+from sqlalchemy import Result, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth_service.schemas import UserSchema
 from app.db.db_helper import db_helper
-from app.jwt_tokens.jwt_process import jwt_decode, jwt_encode
 from app.db.models import User
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import Result, select
+from app.jwt_tokens.jwt_process import jwt_decode, jwt_encode
 
 user_tokens: dict[int, str] = {}
 
@@ -38,8 +38,8 @@ async def create_and_put_token(user: User) -> str:
 
 
 async def register_view(
-        user_in: UserSchema,
-        session: AsyncSession,
+    user_in: UserSchema,
+    session: AsyncSession,
 ) -> str:
     """Регистрация пользователя."""
     if await found_user(user_in.name, session):
@@ -58,7 +58,7 @@ async def register_view(
 
 async def validate_auth_user(
     user_in: UserSchema,
-    session: AsyncSession = Depends(db_helper.scoped_session_dependency)
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> User:
     """Валидация пользователя."""
     user_bd = await found_user(user_in.name, session)
