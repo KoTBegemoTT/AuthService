@@ -4,8 +4,6 @@ import uvicorn
 from fastapi import FastAPI
 
 from app.auth_service.urls import router as users_router
-from app.db.db_helper import db_helper
-from app.db.models import Base
 from app.external.kafka import producer
 
 
