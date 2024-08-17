@@ -12,8 +12,6 @@ from app.external.kafka import producer
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Настройка при запуске и остановке приложения."""
-    async with db_helper.engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
     await producer.start()
     yield
     await producer.stop()
