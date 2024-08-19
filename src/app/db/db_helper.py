@@ -18,6 +18,8 @@ class DatabaseHelper:
         self.engine = create_async_engine(
             url=url,
             echo=echo,
+            pool_size=10,
+            max_overflow=20,  # noqa: WPS432
         )
         self.session_factory = async_sessionmaker(
             bind=self.engine,

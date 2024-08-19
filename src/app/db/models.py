@@ -14,10 +14,12 @@ class Base(DeclarativeBase):
 class User(Base):
     """Модель пользователя."""
 
-    __tablename__ = 'users'
+    __tablename__ = 'lebedev_user'
 
     name: Mapped[str] = mapped_column(String(100), unique=True)
     password: Mapped[bytes]
     balance: Mapped[int] = mapped_column(BigInteger, default=0)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
-    verification_vector: Mapped[list[float] | None] = mapped_column(ARRAY(Numeric(8, 7)))  # noqa: E501
+    verification_vector: Mapped[list[float] | None] = mapped_column(
+        ARRAY(Numeric(8, 7)),
+    )

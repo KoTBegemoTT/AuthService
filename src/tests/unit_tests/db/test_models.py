@@ -32,11 +32,11 @@ async def test_user_model(pyload, db_helper):
     [
         pytest.param(
             {'password': b'password'},
-            'значение NULL в столбце "name" отношения "users" нарушает ограничение NOT NULL',  # noqa: E501
+            'значение NULL в столбце "name"',  # noqa: E501
             id='no_name'),
         pytest.param(
             {'name': 'user'},
-            'значение NULL в столбце "password" отношения "users" нарушает ограничение NOT NULL',  # noqa: E501
+            'значение NULL в столбце "password"',  # noqa: E501
             id='no_password'),
     ],
 )

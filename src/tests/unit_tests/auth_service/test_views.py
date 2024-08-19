@@ -215,7 +215,7 @@ async def test_validate_auth_user_fail_wrong_password(
 @pytest.mark.usefixtures('mock_verify_password', 'clear_tokens')
 @pytest.mark.asyncio
 async def test_create_and_put_token(
-        mock_token, username, password, db_helper,
+        mock_token, username, password,
 ):
     user = User(name=username, password=bytes(password, 'utf-8'))
 
