@@ -19,7 +19,6 @@ class Settings(BaseSettings):
     # Настройки Kafka
     kafka_host: str = 'kafka'
     kafka_port: str = '9092'
-    kafka_instance: str = f'{kafka_host}:{kafka_port}'
     kafka_producer_topic: str = 'faces'
     file_encoding: str = 'utf-8'
     file_compression_quality: int = 1
@@ -36,6 +35,11 @@ class Settings(BaseSettings):
     def db_url(self) -> str:
         """Ссылка на БД."""
         return f'postgresql+asyncpg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}'  # noqa: E501, WPS221
+
+    @property
+    def kafka_instance(self) -> str:
+        """Ссылка на kafka."""
+        return f'{self.kafka_host}:{self.kafka_port}'
 
 
 settings = Settings()
