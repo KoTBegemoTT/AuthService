@@ -32,7 +32,6 @@ class Settings(BaseSettings):
     db_name: str = 'credit_card'
     db_echo: bool = False
 
-
     @property
     def db_url(self) -> str:
         """Ссылка на БД."""
