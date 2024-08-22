@@ -1,9 +1,17 @@
-from sqlalchemy import String
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import MetaData, String
+from sqlalchemy.orm import Mapped, declarative_base, mapped_column
 from sqlalchemy.types import ARRAY, BigInteger, Boolean, Numeric
 
+from app.config import settings
 
-class Base(DeclarativeBase):
+schema = settings.db_schema
+
+Base = declarative_base(
+    metadata=MetaData(schema=schema),
+)
+
+
+class BaseTable(Base):  # type: ignore
     """Базовая модель."""
 
     __abstract__ = True
@@ -11,7 +19,7 @@ class Base(DeclarativeBase):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
 
 
-class User(Base):
+class User(BaseTable):
     """Модель пользователя."""
 
     __tablename__ = 'lebedev_user'
