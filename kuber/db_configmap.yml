@@ -3,9 +3,6 @@ kind: ConfigMap
 metadata:
   name: lebedev-database-configmap
 data:
-  db_host: 'postgres-service'
-  db_port: '5432'
-  db_schema: 'lebedev_schema'
-  db_user: 'username'
-  db_password: 'password'
-  db_name: 'lebedev'
+  db_host: "postgres-service"
+  db_port: "5432"
+  db_schema: "lebedev_schema"

@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: lebedev-auth-configmap
 data:
-  kafka_host: 'infra-kafka-controller-headless'
-  kafka_port: '9092'
-  kafka_producer_topic: 'lebedev_faces'
+  kafka_host: "infra-kafka-controller-headless"
+  kafka_port: "9092"
+  kafka_producer_topic: "lebedev_faces"
