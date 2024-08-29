@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.faces_pvc.name }}
+  labels:
+    {{- include "lebedev-auth.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  - {{ .Values.faces_pvc.accessModes }}
+  resources:
+    requests:
+      storage: {{ .Values.faces_pvc.size }}
+  storageClassName: {{ .Values.faces_pvc.storageClassName }}

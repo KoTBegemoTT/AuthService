@@ -41,9 +41,6 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 2
           failureThreshold: 5
-        volumeMounts:
-        - name: photos
-          mountPath: /usr/photos
         env:
         # Database (secret)
         - name: DB_USER
@@ -95,6 +92,9 @@ spec:
             configMapKeyRef:
               name: lebedev-auth-configmap
               key: kafka_producer_topic
+        volumeMounts:
+        - name: photos
+          mountPath: /usr/photos
       volumes:
       - name: photos
         persistentVolumeClaim:

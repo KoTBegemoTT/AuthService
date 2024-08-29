@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configmap.name }}
+  labels:
+    {{- include "lebedev-auth.labels" . | nindent 4 }}
+data:
+  kafka_host: {{ .Values.configmap.data.kafka_host }}
+  kafka_port: {{ .Values.configmap.data.kafka_port }}
+  kafka_producer_topic: {{ .Values.configmap.data.kafka_producer_topic }}_
