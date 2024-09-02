@@ -178,3 +178,12 @@ async def test_check_ready(ac):
     response = await ac.get('/healthz/ready/')
 
     assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.asyncio
+async def test_metrics(ac):
+    response = await ac.get('/metrics/')
+    help_string = '# HELP auth_request_count_total Total number of requests'
+
+    assert response.status_code == status.HTTP_200_OK
+    assert help_string in response.text
