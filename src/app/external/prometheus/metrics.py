@@ -2,7 +2,7 @@ from typing import Final
 
 from prometheus_client import Counter, Gauge, Histogram
 
-SERVICE_PREFIX: Final[str] = 'auth'
+SERVICE_PREFIX: Final[str] = 'lebedev_auth'
 REQUEST_COUNT = Counter(
     name=f'{SERVICE_PREFIX}_request_count',
     documentation='Total number of requests',
