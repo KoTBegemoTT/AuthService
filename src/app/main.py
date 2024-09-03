@@ -22,7 +22,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(users_router)
 
 metrics_app = make_asgi_app()
-app.mount('/metrics', metrics_app)
+app.mount('/metrics/', metrics_app)
 
 app.add_middleware(BaseHTTPMiddleware, dispatch=metrics_middleware)
 
