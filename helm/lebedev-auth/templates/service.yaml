@@ -4,6 +4,8 @@ metadata:
   name: {{ include "lebedev-auth.fullname" . }}
   labels:
     {{- include "lebedev-auth.labels" . | nindent 4 }}
+  annotations:
+    {{- include "lebedev-auth.prometheus_annotations" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:

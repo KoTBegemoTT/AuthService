@@ -8,7 +8,7 @@ image:
   repository: kotbegemott/auth-service
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2"
+  tag: "4"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -133,3 +133,7 @@ faces_pvc:
 faces_volume:
   name: photos
   mountPath: /usr/photos
+
+prometheus:
+  enabled: true
+  metricsPath: /metrics/

@@ -60,3 +60,12 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Prometheus annotations
+*/}}
+{{- define "lebedev-auth.prometheus_annotations" -}}
+prometheus.io/scrape: "{{ .Values.prometheus.enabled }}"
+prometheus.io/path: "{{ .Values.prometheus.metricsPath }}"
+prometheus.io/port: "{{ .Values.service.port }}"
+{{- end }}
