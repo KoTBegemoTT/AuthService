@@ -19,6 +19,7 @@ sqlalchemy = {extras = ["asyncio"], version = "^2.0.32"}
 asyncpg = "^0.29.0"
 alembic = "^1.13.2"
 prometheus-client = "^0.20.0"
+jaeger-client = "^4.8.0"
 
 [tool.poetry.group.dev.dependencies]
 wemake-python-styleguide = "^0.19.2"

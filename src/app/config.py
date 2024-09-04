@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     db_echo: bool = False
     db_schema: str = 'lebedev_schema'
 
+    # Настройки Jaeger
+    jaeger_agent_host: str = 'host.docker.internal'
+    jaeger_agent_port: str = '6831'
+
     @property
     def db_url(self) -> str:
         """Ссылка на БД."""

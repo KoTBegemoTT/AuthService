@@ -7,10 +7,10 @@ from fastapi import HTTPException, UploadFile, status
 
 from app.config import settings
 
-loop = asyncio.get_event_loop()
-producer = AIOKafkaProducer(
-    loop=loop, bootstrap_servers=settings.kafka_instance,
-)
+# loop = asyncio.get_event_loop()
+# producer = AIOKafkaProducer(
+#     loop=loop, bootstrap_servers=settings.kafka_instance,
+# )
 
 
 async def compress(message: str) -> bytes:

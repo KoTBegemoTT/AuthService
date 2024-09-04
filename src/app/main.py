@@ -6,16 +6,19 @@ from prometheus_client import make_asgi_app
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.auth_service.urls import router as users_router
-from app.external.kafka import producer
+# from app.external.kafka import producer
 from app.middleware import metrics_middleware
+from app.external.jaeger import initialize_jaeger_tracer
+from opentracing import global_tracer
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Настройка при запуске и остановке приложения."""
-    await producer.start()
+    initialize_jaeger_tracer()
+    # await producer.start()
     yield
-    await producer.stop()
+    # await producer.stop()
 
 
 app = FastAPI(lifespan=lifespan)
@@ -26,6 +29,12 @@ app.mount('/metrics/', metrics_app)
 
 app.add_middleware(BaseHTTPMiddleware, dispatch=metrics_middleware)
 
+
+@app.get('/test/', status_code=status.HTTP_200_OK)
+async def test_jaeger():
+    with global_tracer().start_active_span("test_jaeger") as scope:
+        scope.span.set_tag("result", "success")
+        return {'message': 'Service is ready'}
 
 @app.get('/')
 async def root():
