@@ -1,6 +1,7 @@
 import bcrypt  # noqa: WPS202
 from fastapi import Depends, HTTPException, status
 from jwt import ExpiredSignatureError, InvalidTokenError
+from opentracing import global_tracer
 from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,9 +26,10 @@ def verify_password(password: str, hashed_password: bytes) -> bool:
 
 async def found_user(username: str, session: AsyncSession) -> User | None:
     """Получение пользователя по имени."""
-    db_request = select(User).where(User.name == username)
-    founded_user: Result = await session.execute(db_request)
-    return founded_user.scalar()
+    with global_tracer().start_active_span('found_user'):
+        db_request = select(User).where(User.name == username)
+        founded_user: Result = await session.execute(db_request)
+        return founded_user.scalar()
 
 
 async def create_and_put_token(user: User) -> str:
@@ -42,18 +44,21 @@ async def register_view(
     session: AsyncSession,
 ) -> str:
     """Регистрация пользователя."""
-    if await found_user(user_in.name, session):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail='Username already exists',
-        )
+    with global_tracer().start_active_span('register_view') as scope:
+        scope.span.set_tag('user_data', str(user_in))
+        if await found_user(user_in.name, session):
+            scope.span.set_tag('error', 'User already exists')
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail='Username already exists',
+            )
 
-    hashed_password = hash_password(user_in.password)
+        hashed_password = hash_password(user_in.password)
 
-    user = User(name=user_in.name, password=hashed_password)
-    session.add(user)
-    await session.commit()
-    return await create_and_put_token(user)
+        user = User(name=user_in.name, password=hashed_password)
+        session.add(user)
+        await session.commit()
+        return await create_and_put_token(user)
 
 
 async def validate_auth_user(
@@ -61,21 +66,25 @@ async def validate_auth_user(
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> User:
     """Валидация пользователя."""
-    user_bd = await found_user(user_in.name, session)
+    with global_tracer().start_active_span('validate_auth_user') as scope:
+        scope.span.set_tag('user_data', str(user_in))
+        user_bd = await found_user(user_in.name, session)
 
-    if user_bd is None:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail='Invalid username or password',
-        )
+        if user_bd is None:
+            scope.span.set_tag('error', 'User not found')
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='Invalid username or password',
+            )
 
-    if not verify_password(user_in.password, user_bd.password):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail='Invalid username or password',
-        )
+        if not verify_password(user_in.password, user_bd.password):
+            scope.span.set_tag('error', 'Wrong password')
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='Invalid username or password',
+            )
 
-    return user_bd
+        return user_bd
 
 
 async def is_token_expired(token: str) -> bool:
@@ -94,14 +103,18 @@ async def is_token_exist(user_id: int) -> bool:
 
 async def auth_view(user: User) -> str:
     """Авторизация пользователя."""
-    if not await is_token_exist(user.id):
-        return await create_and_put_token(user)
+    with global_tracer().start_active_span('auth_view') as scope:
+        scope.span.set_tag('user_id', str(user.id))
+        if not await is_token_exist(user.id):
+            scope.span.set_tag('info', 'Token not found, creating new')
+            return await create_and_put_token(user)
 
-    token = user_tokens[user.id]
-    if await is_token_expired(token):
-        return await create_and_put_token(user)
+        token = user_tokens[user.id]
+        if await is_token_expired(token):
+            scope.span.set_tag('info', 'Token expired, creating new')
+            return await create_and_put_token(user)
 
-    return token
+        return token
 
 
 async def get_token(
@@ -109,29 +122,39 @@ async def get_token(
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     """Получение токена."""
-    user = await session.get(User, user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail='Token not found',
-        )
+    with global_tracer().start_active_span('get_token') as scope:
+        user = await session.get(User, user_id)
+        if not user:
+            scope.span.set_tag('error', 'User not found')
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail='Token not found',
+            )
 
-    if not await is_token_exist(user.id):
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail='Token not found',
-        )
+        if not await is_token_exist(user.id):
+            scope.span.set_tag('error', 'Token not found')
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail='Token not found',
+            )
 
-    return user_tokens[user.id]
+        return user_tokens[user.id]
 
 
 async def validate_token(token: str = Depends(get_token)) -> None:
     """Валидация токена."""
-    try:
-        jwt_decode(token)
-    except ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail='token expired',
-        )
-    except InvalidTokenError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid token',
-        )
+    with global_tracer().start_active_span('validate_token') as scope:
+        try:
+            jwt_decode(token)
+        except ExpiredSignatureError:
+            scope.span.set_tag('error', 'token expired')
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='token expired',
+            )
+        except InvalidTokenError:
+            scope.span.set_tag('error', 'invalid token')
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='invalid token',
+            )

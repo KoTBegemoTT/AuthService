@@ -1,5 +1,6 @@
 from jaeger_client.config import Config
 from opentracing import Tracer
+
 from app.config import settings
 
 
@@ -17,11 +18,11 @@ def initialize_jaeger_tracer() -> Tracer:
             },
             'logging': True,
         },
-        service_name='transactions-service',
+        service_name=settings.service_name,
         validate=True,
     )
     tracer = config.initialize_tracer()
     if tracer is None:
-        raise Exception('Jaeger tracer is not initialized')
+        raise RuntimeError('Jaeger tracer is not initialized')
 
     return tracer

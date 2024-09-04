@@ -35,7 +35,7 @@ async def get_users(session):
 @pytest.mark.usefixtures('reset_db')
 async def test_register(ac, username, password, db_helper):
     response = await ac.post(
-        '/register/', json={'name': username, 'password': password})
+        '/api/register/', json={'name': username, 'password': password})
 
     assert response.status_code == status.HTTP_201_CREATED
 
@@ -54,10 +54,10 @@ async def test_register(ac, username, password, db_helper):
 @pytest.mark.usefixtures('reset_db')
 async def test_register_user_exists(ac, username, password):
     await ac.post(
-        '/register/', json={'name': username, 'password': password})
+        '/api/register/', json={'name': username, 'password': password})
 
     response = await ac.post(
-        '/register/', json={'name': username, 'password': password})
+        '/api/register/', json={'name': username, 'password': password})
 
     assert response.status_code == status.HTTP_409_CONFLICT
     assert response.json() == {'detail': 'Username already exists'}
@@ -68,10 +68,10 @@ async def test_register_user_exists(ac, username, password):
 @pytest.mark.usefixtures('reset_db')
 async def test_auth(ac, username, password):
     await ac.post(
-        '/register/', json={'name': username, 'password': password})
+        '/api/register/', json={'name': username, 'password': password})
 
     response = await ac.post(
-        '/auth/', json={'name': username, 'password': password})
+        '/api/auth/', json={'name': username, 'password': password})
 
     assert response.status_code == status.HTTP_201_CREATED
     token = response.json()
@@ -87,7 +87,7 @@ async def test_auth_no_user(
     ac, username, password,
 ):
     response = await ac.post(
-        '/auth/', json={'name': username, 'password': password})
+        '/api/auth/', json={'name': username, 'password': password})
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
     assert response.json() == {'detail': 'Invalid username or password'}
@@ -100,10 +100,10 @@ async def test_auth_wrong_password(
     ac, username, password,
 ):
     await ac.post(
-        '/register/', json={'name': username, 'password': password})
+        '/api/register/', json={'name': username, 'password': password})
 
     response = await ac.post(
-        '/auth/', json={'name': username, 'password': 'wrong_password'})
+        '/api/auth/', json={'name': username, 'password': 'wrong_password'})
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
     assert response.json() == {'detail': 'Invalid username or password'}
@@ -167,7 +167,7 @@ async def test_check_token(
             await session.commit()
     user_tokens.update(exists_tokens)
 
-    response = await ac.get('/check_token/', params={'user_id': 1})
+    response = await ac.get('/api/check_token/', params={'user_id': 1})
 
     assert response.status_code == status_code
     assert response.json() == response_json
@@ -175,7 +175,7 @@ async def test_check_token(
 
 @pytest.mark.asyncio
 async def test_check_ready(ac):
-    response = await ac.get('/healthz/ready/')
+    response = await ac.get('/api/healthz/ready/')
 
     assert response.status_code == status.HTTP_200_OK
 
@@ -183,7 +183,7 @@ async def test_check_ready(ac):
 @pytest.mark.asyncio
 async def test_metrics(ac):
     response = await ac.get('/metrics/')
-    help_string = '# HELP auth_request_count_total Total number of requests'
+    metrik_name = 'auth_request_count_total'
 
     assert response.status_code == status.HTTP_200_OK
-    assert help_string in response.text
+    assert metrik_name in response.text

@@ -10,6 +10,9 @@ jwt_public_path = BASE_DIR / 'jwt_tokens' / 'jwt_public.pem'
 class Settings(BaseSettings):
     """Настройки."""
 
+    # Общие настройки
+    service_name: str = 'auth-service'
+
     # Настройки JWT
     jwt_private: str = jwt_private_path.read_text()
     jwt_public: str = jwt_public_path.read_text()
