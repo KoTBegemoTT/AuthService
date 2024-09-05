@@ -22,11 +22,15 @@ async def compress(message: str) -> bytes:
     )
 
 
-async def verify_view(user_photo: UploadFile, user_id: int) -> dict:
+async def verify_view(
+    user_photo: UploadFile,
+    user_id: int,
+    photo_dir: str = '/usr/photos',
+) -> dict:
     """Подтверждение пользователя."""
     with global_tracer().start_active_span('verify_view') as scope:
         scope.span.set_tag('user_id', str(user_id))
-        file_path = f'/usr/photos/{user_photo.filename}'
+        file_path = f'{photo_dir}/{user_photo.filename}'
 
         try:
             async with aiofiles.open(file_path, 'wb') as out_file:
