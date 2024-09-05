@@ -9,17 +9,17 @@ def initialize_jaeger_tracer() -> Tracer:
     config = Config(
         config={
             'sampler': {
-                'type': 'const',
-                'param': 1,
+                'type': settings.jaeger_sampler_type,
+                'param': settings.jaeger_sampler_param,
             },
             'local_agent': {
                 'reporting_host': settings.jaeger_agent_host,
                 'reporting_port': int(settings.jaeger_agent_port),
             },
-            'logging': True,
+            'logging': settings.jaeger_logging,
         },
         service_name=settings.service_name,
-        validate=True,
+        validate=settings.jaeger_validate,
     )
     tracer = config.initialize_tracer()
     if tracer is None:
