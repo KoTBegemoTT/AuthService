@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     # Настройки Jaeger
     jaeger_agent_host: str = 'host.docker.internal'
     jaeger_agent_port: str = '6831'
-    jaeger_sampler_type: str = 'const'
+    jaeger_sampler_type: str = 'probabilistic'
     jaeger_sampler_param: float = 1.0
     jaeger_logging: bool = True
     jaeger_validate: bool = True
