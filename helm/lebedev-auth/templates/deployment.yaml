@@ -36,6 +36,9 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+            - name: SERVICE_NAME
+              value: "{{ .Values.service_name }}"
+
             # db secret
             - name: DB_USER
               valueFrom:
@@ -84,6 +87,18 @@ spec:
                 configMapKeyRef:
                   name: {{ .Values.configmap.name }}
                   key: kafka_producer_topic
+                  
+            # Jaeger
+            - name: JAEGER_AGENT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.jaeger_cofigmap.name }}
+                  key: jaeger_agent_host
+            - name: JAEGER_AGENT_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.jaeger_cofigmap.name }}
+                  key: jaeger_agent_port
 
           volumeMounts:
             - name: {{ .Values.faces_volume.name }}

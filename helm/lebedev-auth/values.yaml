@@ -8,7 +8,7 @@ image:
   repository: kotbegemott/auth-service
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "4"
+  tag: "6"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -137,3 +137,8 @@ faces_volume:
 prometheus:
   enabled: true
   metricsPath: /metrics/
+
+jaeger_cofigmap:
+  name: lebedev-jaeger-configmap
+
+service_name: 'lebedev-auth-service'
