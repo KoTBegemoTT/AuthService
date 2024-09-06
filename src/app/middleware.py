@@ -20,20 +20,23 @@ from app.external.prometheus.metrics_updaters import (
 
 async def metrics_middleware(request: Request, call_next):
     """Добавление метрик."""
+    endpoint = request.url.path
+    if not endpoint.startswith('/api'):
+        return await call_next(request)
+
     start_time = time.time()
     response = await call_next(request)
     process_time = time.time() - start_time
 
-    endpoint = request.url.path
     method = request.method
     status = response.status_code
 
     request_duration_update(method, endpoint, process_time)
     request_count_update(method, endpoint, status)
 
-    if endpoint == '/healthz/ready/':
+    if endpoint == '/api/healthz/ready/':
         ready_probe_status_update(status)
-    elif endpoint == '/auth/':
+    elif endpoint == '/api/auth/':
         auth_attempts_update(status)
 
     return response
