@@ -11,6 +11,7 @@ from app.auth_service.views import (
 from app.db.db_helper import db_helper
 from app.db.models import User
 from app.external.kafka import verify_view
+from app.external.redis_client import RedisClient, get_redis_client
 
 router = APIRouter(tags=['users'])
 
@@ -30,10 +31,11 @@ async def ready_check() -> None:
 )
 async def register(
     user_in: UserSchema,
+    redis_client: RedisClient = Depends(get_redis_client),
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> str:
     """Регистрация пользователя."""
-    return await register_view(user_in, session)
+    return await register_view(user_in, redis_client, session)
 
 
 @router.post(
@@ -42,9 +44,10 @@ async def register(
 )
 async def auth(
     user_in: User = Depends(validate_auth_user),
+    redis_client: RedisClient = Depends(get_redis_client),
 ) -> str:
     """Авторизация пользователя."""
-    return await auth_view(user_in)
+    return await auth_view(user_in, redis_client)
 
 
 @router.get(

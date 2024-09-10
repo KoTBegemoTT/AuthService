@@ -9,10 +9,8 @@ from app.auth_service.views import (
     found_user,
     get_token,
     hash_password,
-    is_token_exist,
     is_token_expired,
     register_view,
-    user_tokens,
     validate_auth_user,
     validate_token,
     verify_password,
@@ -73,20 +71,20 @@ async def test_hash_and_verify_password(
 
 @pytest.mark.parametrize('username, password', user_password_params)
 @pytest.mark.asyncio
-@pytest.mark.usefixtures('mock_hash_password', 'reset_db', 'clear_tokens')
+@pytest.mark.usefixtures('mock_hash_password', 'reset_db',)
 async def test_register(
-    mock_token, db_helper, username, password,
+    mock_token, db_helper, username, password, redis_mock,
 ):
     new_user = UserSchema(name=username, password=password)
 
     async with db_helper.session_factory() as session:
-        await register_view(new_user, session)
+        await register_view(new_user, redis_mock, session)
         users = await get_users(session)
 
     assert len(users) == 1
-    assert len(user_tokens) == 1
+    assert len(redis_mock.get_cache()) == 1
     user = users[0]
-    token = user_tokens[user.id]
+    token = redis_mock.get_token(user.id)
 
     assert user.name == username
     assert user.password == bytes(password, 'utf-8')
@@ -94,20 +92,20 @@ async def test_register(
 
 
 @pytest.mark.asyncio
-@pytest.mark.usefixtures('mock_hash_password', 'reset_db', 'clear_tokens')
-async def test_register_many_users(mock_token, db_helper):
+@pytest.mark.usefixtures('mock_hash_password', 'reset_db')
+async def test_register_many_users(mock_token, db_helper, redis_mock):
     async with db_helper.session_factory() as session:
         for i in range(10):
             new_user = UserSchema(name=f'user_{i}', password=f'password_{i}')
-            await register_view(new_user, session)
+            await register_view(new_user, redis_mock, session)
         users = await get_users(session)
 
     assert len(users) == 10
-    assert len(user_tokens) == 10
+    assert len(redis_mock.get_cache()) == 10
 
     for i in range(10):
         user = users[i]
-        token = user_tokens[user.id]
+        token = redis_mock.get_token(user.id)
 
         assert user.name == f'user_{i}'
         assert user.password == bytes(f'password_{i}', 'utf-8')
@@ -115,7 +113,7 @@ async def test_register_many_users(mock_token, db_helper):
 
 
 @pytest.mark.asyncio
-@pytest.mark.usefixtures('mock_hash_password', 'reset_db', 'clear_tokens')
+@pytest.mark.usefixtures('mock_hash_password', 'reset_db')
 async def test_found_user(db_helper):
     async with db_helper.session_factory() as session:
         assert await found_user('user_1', session) is None
@@ -139,19 +137,21 @@ async def test_found_user(db_helper):
 )
 @pytest.mark.asyncio
 @pytest.mark.usefixtures(
-    'mock_hash_password', 'reset_db', 'clear_tokens', 'mock_token',
+    'mock_hash_password', 'reset_db', 'mock_token',
 )
 async def test_register_fail_user_exists(
-        db_helper, username, password, second_password,
+        db_helper, username, password, second_password, redis_mock,
 ):
     async with db_helper.session_factory() as session:
         with pytest.raises(HTTPException) as ex:
             await register_view(
                 UserSchema(name=username, password=password),
+                redis_mock,
                 session,
             )
             await register_view(
                 UserSchema(name=username, password=second_password),
+                redis_mock,
                 session,
             )
 
@@ -212,27 +212,17 @@ async def test_validate_auth_user_fail_wrong_password(
 
 
 @pytest.mark.parametrize('username, password', user_password_params)
-@pytest.mark.usefixtures('mock_verify_password', 'clear_tokens')
+@pytest.mark.usefixtures('mock_verify_password')
 @pytest.mark.asyncio
 async def test_create_and_put_token(
-        mock_token, username, password,
+        mock_token, username, password, redis_mock,
 ):
     user = User(name=username, password=bytes(password, 'utf-8'))
 
-    token = await create_and_put_token(user)
+    token = await create_and_put_token(user, redis_mock)
 
     assert token == mock_token
-    assert user_tokens[user.id] == token
-
-
-@pytest.mark.asyncio
-@pytest.mark.usefixtures('clear_tokens')
-async def test_is_token_exist():
-    user = User(name='user_1', password=b'password_1')
-    assert not await is_token_exist(user.id)
-
-    user_tokens[user.id] = 'token'
-    assert await is_token_exist(user.id)
+    assert redis_mock.get_token(user.id) == token
 
 
 @pytest.mark.asyncio
@@ -240,7 +230,6 @@ async def test_is_token_exist():
     pytest.param(0, True, id='expired_token'),
     pytest.param(10, False, id='not_expired_token'),
 ])
-@pytest.mark.usefixtures('clear_tokens')
 async def test_is_token_expired(expire_minutes, is_expired):
     user = User(name='user_1', password=b'password_1')
     token = jwt_encode(user=user, expire_minutes=expire_minutes)
@@ -250,10 +239,9 @@ async def test_is_token_expired(expire_minutes, is_expired):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize('username, password', user_password_params)
-@pytest.mark.usefixtures('clear_tokens')
-async def test_auth_no_token(mock_token, username, password):
+async def test_auth_no_token(mock_token, username, password, redis_mock):
     user = User(name=username, password=bytes(password, 'utf-8'))
-    token = await auth_view(user)
+    token = await auth_view(user, redis_mock)
     assert token == mock_token
 
 
@@ -264,17 +252,17 @@ async def test_auth_no_token(mock_token, username, password):
         pytest.param('user_1', 'password_1', 0, False, id='expired_token'),
         pytest.param('user_1', 'password_1', 10, True, id='not_expired_token'),
     ])
-@pytest.mark.usefixtures('clear_tokens', 'mock_token')
+@pytest.mark.usefixtures('mock_token')
 async def test_auth_token(
-    username, password, expire_minutes, is_token_old,
+    username, password, expire_minutes, is_token_old, redis_mock,
 ):
-    user = User(name=username, password=bytes(password, 'utf-8'))
+    user = User(id=1, name=username, password=bytes(password, 'utf-8'))
     old_token = jwt_encode(user=user, expire_minutes=expire_minutes)
-    user_tokens[user.id] = old_token
+    redis_mock.set_token(old_token, user.id)
 
-    token = await auth_view(user)
+    token = await auth_view(user, redis_mock)
 
-    assert user_tokens[user.id] == token
+    assert redis_mock.get_token(user.id) == token
     is_token_equal = (token == old_token)
     assert is_token_equal == is_token_old  # noqa: WPS309
 
@@ -310,41 +298,47 @@ async def test_validate_token_expired():
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize('username, password', user_password_params)
-@pytest.mark.usefixtures('clear_tokens', 'reset_db')
-async def test_get_token(username, password, db_helper):
+@pytest.mark.usefixtures('reset_db')
+async def test_get_token(username, password, db_helper, redis_mock):
     user = User(name=username, password=bytes(password, 'utf-8'))
     async with db_helper.session_factory() as session:
         session.add(user)
         await session.commit()
 
-        user_tokens[user.id] = 'token'
+        redis_mock.set_token('token', user.id)
 
-        token = await get_token(user_id=user.id, session=session)
+        token = await get_token(
+            user_id=user.id, redis_client=redis_mock, session=session,
+        )
 
     assert token == 'token'
 
 
 @pytest.mark.asyncio
-@pytest.mark.usefixtures('clear_tokens', 'reset_db')
-async def test_get_token_no_user(db_helper):
+@pytest.mark.usefixtures('reset_db')
+async def test_get_token_no_user(db_helper, redis_mock):
     async with db_helper.session_factory() as session:
         with pytest.raises(HTTPException) as ex:
-            await get_token(user_id=1, session=session)
+            await get_token(
+                user_id=1, redis_client=redis_mock, session=session,
+            )
 
     assert ex.value.status_code == status.HTTP_404_NOT_FOUND
     assert ex.value.detail == 'Token not found'
 
 
 @pytest.mark.asyncio
-@pytest.mark.usefixtures('clear_tokens', 'reset_db')
-async def test_get_token_no_token(db_helper):
+@pytest.mark.usefixtures('reset_db')
+async def test_get_token_no_token(db_helper, redis_mock):
     user = User(name='user_1', password=b'password_1')
     async with db_helper.session_factory() as session:
         session.add(user)
         await session.commit()
 
         with pytest.raises(HTTPException) as ex:
-            await get_token(user_id=user.id, session=session)
+            await get_token(
+                user_id=user.id, redis_client=redis_mock, session=session,
+            )
 
     assert ex.value.status_code == status.HTTP_404_NOT_FOUND
     assert ex.value.detail == 'Token not found'

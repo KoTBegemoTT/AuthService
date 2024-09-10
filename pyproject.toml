@@ -20,6 +20,7 @@ asyncpg = "^0.29.0"
 alembic = "^1.13.2"
 prometheus-client = "^0.20.0"
 jaeger-client = "^4.8.0"
+redis = "^5.0.8"
 
 [tool.poetry.group.dev.dependencies]
 wemake-python-styleguide = "^0.19.2"

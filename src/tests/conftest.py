@@ -1,11 +1,11 @@
 import asyncio
 from typing import AsyncGenerator
+from unittest.mock import Mock
 
 import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth_service.views import user_tokens
 from app.db.db_helper import DatabaseHelper, db_helper
 from app.db.models import BaseTable
 from app.main import app
@@ -40,11 +40,33 @@ def event_loop(request):
     loop.close()
 
 
-@pytest.fixture()
-def clear_tokens():
-    user_tokens.clear()
-
-
 @pytest.fixture(scope='session')
 def db_helper():
     return test_db_helper
+
+
+def get_redis_mock() -> Mock:
+    redis_cashe: dict[str, str] = {}
+
+    def get_token(user_id: int):
+        return redis_cashe.get(f'user_id:{user_id}', None)
+
+    def set_token(token: str, user_id: int):
+        redis_cashe[f'user_id:{user_id}'] = token
+
+    redis_client = Mock()
+    redis_client.get_token = get_token
+    redis_client.set_token = set_token
+
+    redis_client.get_cache = lambda: redis_cashe
+
+    return redis_client
+
+
+@pytest.fixture
+def redis_mock() -> Mock:
+    return get_redis_mock()
+
+
+rm = get_redis_mock()
+rm.set_token('token', 1)

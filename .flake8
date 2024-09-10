@@ -9,6 +9,8 @@ ignore =
     D104,
     # Missing docstring in __init__
     D107,
+    # Found wrong variable name
+    WPS110,
     # Found too many module members
     WPS202,
     # Found too many local variables
@@ -28,5 +30,7 @@ ignore =
     WPS602,
     # Found implicit `.get()` dict usage
     WPS529,
+    # Found unpythonic getter or setter
+    WPS615,
     # Do not perform function calls in argument defaults.
     B008

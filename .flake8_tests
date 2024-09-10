@@ -40,6 +40,8 @@ ignore =
     D102,
     D103,
     D104,
+    # Found commented out code
+    E800,
     # Use of assert detected
     S101,
     # trailing comma prohibited

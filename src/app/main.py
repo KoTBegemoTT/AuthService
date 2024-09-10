@@ -8,6 +8,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from app.auth_service.urls import router as users_router
 from app.external.jaeger import initialize_jaeger_tracer
 from app.external.kafka import producer
+from app.external.redis_client import get_redis_client
 from app.middleware import metrics_middleware, tracing_middleware
 
 
@@ -15,9 +16,11 @@ from app.middleware import metrics_middleware, tracing_middleware
 async def lifespan(app: FastAPI):
     """Настройка при запуске и остановке приложения."""
     initialize_jaeger_tracer()
+    redis_client = get_redis_client()
     await producer.start()
     yield
     await producer.stop()
+    redis_client.close()
 
 
 app = FastAPI(lifespan=lifespan)

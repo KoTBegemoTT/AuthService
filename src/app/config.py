@@ -35,8 +35,13 @@ class Settings(BaseSettings):
     db_echo: bool = False
     db_schema: str = 'lebedev_schema'
 
+    # Настройки Redis
+    redis_host: str = 'redis'
+    redis_port: int = 6379
+    redis_db_number: int = 1
+
     # Настройки Jaeger
-    jaeger_agent_host: str = 'host.docker.internal'
+    jaeger_agent_host: str = 'jaeger'
     jaeger_agent_port: str = '6831'
     jaeger_sampler_type: str = 'probabilistic'
     jaeger_sampler_param: float = 1.0
