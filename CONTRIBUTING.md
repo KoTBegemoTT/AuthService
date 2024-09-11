@@ -20,6 +20,7 @@
 
 - Исходный код проекта: src/app
 - Тесты src/tests
+- Helm чарты ./helm/lebedev-auth
 
 ## Применение миграций
 
