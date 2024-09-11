@@ -2,6 +2,7 @@
 
 Сервис для аунтификации.
 
+Этот сервис является частью группы микросервисов, входной точкой для которых является [ApiGateway](https://hub.mos.ru/shift-python/y2024/homeworks/plebedev/api-gateway)
 
 # REST API
 
