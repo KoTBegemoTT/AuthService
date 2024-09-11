@@ -59,17 +59,17 @@ spec:
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.db_cofigmap.name }}
+                  name: {{ .Values.db_configmap.name }}
                   key: db_host
             - name: DB_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.db_cofigmap.name }}
+                  name: {{ .Values.db_configmap.name }}
                   key: db_port
             - name: DB_SCHEMA
               valueFrom:
                 configMapKeyRef:
-                    name: {{ .Values.db_cofigmap.name }}
+                    name: {{ .Values.db_configmap.name }}
                     key: db_schema
             # Kafka
             - name: KAFKA_HOST
@@ -92,13 +92,30 @@ spec:
             - name: JAEGER_AGENT_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.jaeger_cofigmap.name }}
+                  name: {{ .Values.jaeger_configmap.name }}
                   key: jaeger_agent_host
             - name: JAEGER_AGENT_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.jaeger_cofigmap.name }}
+                  name: {{ .Values.jaeger_configmap.name }}
                   key: jaeger_agent_port
+
+            # Redis
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.redis_configmap.name }}
+                  key: redis_host
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.redis_configmap.name }}
+                  key: redis_port
+            - name: REDIS_DB_NUMBER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.redis_configmap.name }}
+                  key: redis_db_number
 
           volumeMounts:
             - name: {{ .Values.faces_volume.name }}
